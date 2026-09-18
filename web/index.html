@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Finde deine eigenen öffentlich zugänglichen Profile und Erwähnungen.">
+  <title>Trace / öffentliche Spuren</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Trace Startseite"><span class="brand-mark">+</span> trace</a>
+      <div class="topbar-note"><span class="status-dot"></span> private by design</div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">PUBLIC PROFILE SEARCH / 01</p>
+          <h1 id="page-title">Welche Spuren<br><em>gehören zu dir?</em></h1>
+          <p class="intro">Prüfe deine eigenen öffentlich zugänglichen Profile und Erwähnungen. Klar, quellenbasiert und ohne Suchmaschinenrauschen.</p>
+        </div>
+        <div class="hero-aside" aria-hidden="true">
+          <div class="orbit orbit-one"></div>
+          <div class="orbit orbit-two"></div>
+          <span class="orbit-cross cross-a">+</span>
+          <span class="orbit-cross cross-b">+</span>
+          <span class="coordinate">52°31' N<br>13°24' E</span>
+        </div>
+      </section>
+
+      <section class="search-panel" aria-labelledby="search-title">
+        <div class="panel-heading">
+          <span class="step-index">01</span>
+          <div><h2 id="search-title">Identität eingeben</h2><p>Beide Angaben bleiben auf diesem Gerät und werden nur für den Quellenabgleich verwendet.</p></div>
+        </div>
+        <form id="scan-form">
+          <label class="field field-name"><span>Name</span><input id="name" name="name" autocomplete="name" placeholder="z. B. Ada Lovelace" required></label>
+          <label class="field field-date"><span>Geburtsdatum</span><input id="birth-date" name="birth_date" type="date" autocomplete="bday" required></label>
+          <button type="submit" class="search-button"><span class="button-label">Spuren suchen</span><span class="button-arrow" aria-hidden="true">↗</span></button>
+        </form>
+        <div class="form-footnote"><span class="lock-icon">⌁</span> Nur konfigurierte, öffentliche Quellen · keine Logins · keine Datenbanken</div>
+      </section>
+
+      <section id="results" class="results-section" aria-live="polite" hidden>
+        <div class="results-heading"><div><p class="eyebrow">SEARCH OUTPUT / 02</p><h2 id="results-title">Ergebnisse</h2></div><span id="result-count" class="result-count"></span></div>
+        <div id="results-list" class="results-list"></div>
+      </section>
+
+      <section id="empty-state" class="empty-state">
+        <span class="empty-line"></span>
+        <p>Deine Suche startet hier.</p>
+        <span class="empty-line"></span>
+      </section>
+    </main>
+
+    <footer class="footer"><span>TRACE / 2026</span><span>Ein Werkzeug für die eigene öffentliche Sichtbarkeit</span><span>v0.1 / local</span></footer>
+  </div>
+  <script src="static/app.js"></script>
+</body>
+</html>

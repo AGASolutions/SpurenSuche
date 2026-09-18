@@ -1,0 +1,12 @@
+{
+  "subject": {
+    "name": "Eigener Name",
+    "birth_date": "1980-01-31"
+  },
+  "sources": [
+    {
+      "name": "Eigene öffentliche Profilseite",
+      "url": "https://example.org/profile"
+    }
+  ]
+}
