@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from datetime import date
 import json
 from pathlib import Path
 from urllib.parse import parse_qs
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from .cli import _load_config, scan
-from .core import Subject
+from .cli import _load_config
+from .search import search_public, validate_request
 
 ROOT = Path(__file__).resolve().parents[2]
 WEB_DIR = ROOT / "web"
@@ -21,10 +20,14 @@ class PersonScanHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.wfile.write(body)
 
     def do_GET(self) -> None:
+        if self.path == "/health":
+            self._json(200, {"status": "ok"})
+            return
         if self.path in {"/", "/index.html"}:
             body = (WEB_DIR / "index.html").read_bytes()
             self._send(200, "text/html; charset=utf-8", body)
@@ -35,6 +38,10 @@ class PersonScanHandler(BaseHTTPRequestHandler):
             return
         if self.path in {"/static/app.js", "/app.js"}:
             body = (WEB_DIR / "app.js").read_bytes()
+            self._send(200, "text/javascript; charset=utf-8", body)
+            return
+        if self.path == "/config.js":
+            body = (WEB_DIR / "config.js").read_bytes()
             self._send(200, "text/javascript; charset=utf-8", body)
             return
         if self.path == "/sources.json":
@@ -52,27 +59,33 @@ class PersonScanHandler(BaseHTTPRequestHandler):
         fields = parse_qs(self.rfile.read(length).decode("utf-8"))
         name = fields.get("name", [""])[0].strip()
         birth_date = fields.get("birth_date", [""])[0].strip()
-        if not name or not birth_date:
+        email = fields.get("email", [""])[0].strip() or None
+        consent = fields.get("consent", [""])[0].lower()
+        if consent not in {"on", "true", "1"}:
             self._json(
-                400, {"error": "Name und Geburtsdatum sind erforderlich."}
+                400,
+                {
+                    "error": (
+                        "Bitte bestätige die Suche nach deiner eigenen Person."
+                    )
+                },
             )
             return
         try:
-            subject = Subject(
-                name=name, birth_date=date.fromisoformat(birth_date)
-            )
+            request = validate_request(name, birth_date, email)
         except ValueError:
-            self._json(400, {"error": "Das Geburtsdatum muss gültig sein."})
+            self._json(
+                400,
+                {"error": "Name, Geburtsdatum oder E-Mail sind ungültig."},
+            )
             return
 
-        findings = [
-            finding.to_dict() for finding in scan(subject, self.sources)
-        ]
+        findings = [result.to_dict() for result in search_public(request)]
         self._json(
             200,
             {
-                "subject": {"name": subject.name},
-                "scope": "Konfigurierte öffentliche Quellen",
+                "subject": {"name": request.subject.name},
+                "scope": "Serverseitige Abfrage öffentlicher Provider",
                 "findings": findings,
             },
         )

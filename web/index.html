@@ -41,9 +41,11 @@
         <form id="scan-form">
           <label class="field field-name"><span>Name</span><input id="name" name="name" autocomplete="name" placeholder="z. B. Ada Lovelace" required></label>
           <label class="field field-date"><span>Geburtsdatum</span><input id="birth-date" name="birth_date" type="date" autocomplete="bday" required></label>
+          <label class="field field-email"><span>E-Mail optional</span><input id="email" name="email" type="email" autocomplete="email" placeholder="du@example.org"></label>
           <button type="submit" class="search-button"><span class="button-label">Spuren suchen</span><span class="button-arrow" aria-hidden="true">↗</span></button>
         </form>
-        <div class="form-footnote"><span class="lock-icon">⌁</span> Öffentliche Wikimedia-Quelle · keine Logins · keine privaten Datenbanken</div>
+        <label class="consent-line"><input id="consent" name="consent" type="checkbox" required><span>Ich suche nach mir selbst oder habe die ausdrückliche Zustimmung der betroffenen Person.</span></label>
+        <div class="form-footnote"><span class="lock-icon">⌁</span> Backend-Suche · keine Speicherung · keine privaten Datenbanken</div>
       </section>
 
       <section id="results" class="results-section" aria-live="polite" hidden>
@@ -60,6 +62,7 @@
 
     <footer class="footer"><span>TRACE / 2026</span><span>Ein Werkzeug für die eigene öffentliche Sichtbarkeit</span><span>v0.1 / local</span></footer>
   </div>
+  <script src="config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

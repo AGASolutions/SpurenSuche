@@ -6,6 +6,7 @@ const resultCount = document.querySelector('#result-count');
 const resultsTitle = document.querySelector('#results-title');
 const button = form.querySelector('button');
 const staticSourcesUrl = 'sources.json';
+const apiUrl = (window.TRACE_API_URL || '').replace(/\/$/, '');
 
 const labels = {
   match: 'Treffer',
@@ -86,13 +87,17 @@ form.addEventListener('submit', async (event) => {
   try {
     let data;
     const isLocalServer = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-    if (isLocalServer) {
-      const response = await fetch('scan', {
+    if (isLocalServer || apiUrl) {
+      const endpoint = apiUrl ? `${apiUrl}/scan` : 'scan';
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams(new FormData(form))
       });
-      if (!response.ok) throw new Error('Der lokale Scan-Server ist nicht erreichbar.');
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || 'Der Suchserver ist nicht erreichbar.');
+      }
       data = await response.json();
     } else {
       data = {
