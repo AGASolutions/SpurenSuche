@@ -35,8 +35,10 @@ Mit den explizit erlaubten Quellen aus einer Konfiguration startet die lokale We
 PYTHONPATH=src python -m person_scan.web example.config.json
 ```
 
-Danach `http://127.0.0.1:8080` öffnen. Die Eingaben werden nur für den lokalen
-Scan verwendet. Die Ergebnisse verlinken auf die jeweilige konfigurierte Quelle.
+Danach `http://127.0.0.1:8080` öffnen. Lokal wird der vollständige Scan der
+konfigurierten Quellen verwendet. Auf GitHub Pages sucht die Oberfläche nur in
+der öffentlichen Wikimedia/Wikipedia-Suche und markiert Ergebnisse zur
+manuellen Prüfung; sie erstellt keine privaten Personendossiers.
 
 ## GitHub Pages
 

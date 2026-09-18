@@ -48,6 +48,31 @@ async function staticFindings(name) {
   }));
 }
 
+async function wikipediaFindings(name, birthDate) {
+  const params = new URLSearchParams({
+    action: 'query',
+    list: 'search',
+    srsearch: name,
+    srnamespace: '0',
+    srlimit: '8',
+    srprop: 'snippet',
+    format: 'json',
+    origin: '*'
+  });
+  const response = await fetch(
+    `https://de.wikipedia.org/w/api.php?${params.toString()}`
+  );
+  if (!response.ok) throw new Error('Die öffentliche Quellenabfrage ist nicht erreichbar.');
+  const data = await response.json();
+  return (data.query?.search || []).map((item) => ({
+    source: 'Wikimedia / Wikipedia',
+    url: `https://de.wikipedia.org/wiki/${encodeURIComponent(item.title.replaceAll(' ', '_'))}`,
+    title: item.title,
+    status: 'manual_review',
+    excerpt: `${item.snippet.replace(/<[^>]*>/g, '')} Prüfe den Treffer anhand des Geburtsdatums ${birthDate}.`
+  }));
+}
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
   button.disabled = true;
@@ -59,24 +84,28 @@ form.addEventListener('submit', async (event) => {
   results.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   try {
-    const response = await fetch('scan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(new FormData(form))
-    });
     let data;
-    if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+    const isLocalServer = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+    if (isLocalServer) {
+      const response = await fetch('scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(new FormData(form))
+      });
+      if (!response.ok) throw new Error('Der lokale Scan-Server ist nicht erreichbar.');
       data = await response.json();
     } else {
-      data = { subject: { name: form.name.value }, findings: await staticFindings(form.name.value) };
+      data = {
+        subject: { name: form.name.value },
+        findings: await wikipediaFindings(form.name.value, form.birth_date.value)
+      };
     }
-    if (!response.ok && !data.findings) throw new Error(data.error || 'Die Suche konnte nicht gestartet werden.');
     const findings = data.findings || [];
     resultsTitle.textContent = `Spuren für ${data.subject.name}`;
     resultCount.textContent = `${findings.length} QUELLE${findings.length === 1 ? '' : 'N'} GEPRÜFT`;
     resultsList.innerHTML = findings.length
       ? findings.map(resultCard).join('')
-      : '<p class="error-message">Keine Ergebnisse in den konfigurierten Quellen.</p>';
+      : '<p class="error-message">Keine öffentlichen Treffer für diese Namenssuche.</p>';
   } catch (error) {
     resultsTitle.textContent = 'Suche nicht möglich';
     resultCount.textContent = '';
