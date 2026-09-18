@@ -29,11 +29,11 @@ class PersonScanHandler(BaseHTTPRequestHandler):
             body = (WEB_DIR / "index.html").read_bytes()
             self._send(200, "text/html; charset=utf-8", body)
             return
-        if self.path == "/static/styles.css":
+        if self.path in {"/static/styles.css", "/styles.css"}:
             body = (WEB_DIR / "styles.css").read_bytes()
             self._send(200, "text/css; charset=utf-8", body)
             return
-        if self.path == "/static/app.js":
+        if self.path in {"/static/app.js", "/app.js"}:
             body = (WEB_DIR / "app.js").read_bytes()
             self._send(200, "text/javascript; charset=utf-8", body)
             return
